@@ -1,11 +1,14 @@
 import random
 
-
 class TreeNode:
     def __init__(self, value):
         self.value = value
         self.left = None
         self.right = None
+
+    def __repr__(self):
+        return f"TreeNode({self.value})"
+
 
 
 def insert_into_tree(root, value):
@@ -24,6 +27,8 @@ def generate_random_tree(n):
     # Шаг 2: Перемешать значения
     random.shuffle(values)
     # Шаг 3: Построить дерево
+
+    values = [5, 3, 2, 1, 4, 8, 6, 7, 10, 9]
     root = None
     for value in values:
         root = insert_into_tree(root, value)
@@ -54,14 +59,33 @@ print("Прямой обход (Pre-order):", pre_order_traversal(tree))
 
 path = []
 
+
 def process_node(node):
     path.append(node.value)
 
-def traverse_to_fork(root):
-    while root and (root.left or root.right):
+
+def traverse_tree(root):
+    def get_terminator(root):
+        while root and (root.left or root.right):
+            root = root.right if root.right else root.left
+        return root
+
+    marker = TreeNode("Marker")
+
+    while root:
         process_node(root)
-        root = root.left if root.left else root.right
+        if root.left is marker:  # Второе посещение терминатора
+            root = root.right  # Сначала делаем правое поддерево новым root
+            root.left = None  # Разрываем служебную ссылку (маркер)
+            root.right = None  # Разрываем ссылку на правое поддерево
+        elif root.left and root.right:
+            terminator = get_terminator(root.left)
+            terminator.left = marker  # Устанавливаем маркер
+            terminator.right = root.right  # Сохраняем ссылку на правое поддерево
+            root = root.left
+        else:
+            root = root.left if root.left else root.right
 
-traverse_to_fork(tree)
+
+traverse_tree(tree)
 print(path)
-
