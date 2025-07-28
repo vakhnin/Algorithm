@@ -51,3 +51,17 @@ tree = generate_random_tree(10)
 # Вывод результатов обхода
 print(print_tree(tree))
 print("Прямой обход (Pre-order):", pre_order_traversal(tree))
+
+path = []
+
+def process_node(node):
+    path.append(node.value)
+
+def traverse_to_fork(root):
+    while root and (root.left or root.right):
+        process_node(root)
+        root = root.left if root.left else root.right
+
+traverse_to_fork(tree)
+print(path)
+
