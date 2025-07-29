@@ -30,7 +30,7 @@ def generate_random_tree(n):
     random.shuffle(values)
     # Шаг 3: Построить дерево
 
-    values = [5, 3, 2, 1, 4, 8, 6, 7, 10, 9]
+    # values = [5, 3, 2, 1, 4, 8, 6, 7, 10, 9]
     root = None
     for value in values:
         root = insert_into_tree(root, value)
@@ -43,6 +43,7 @@ def pre_order_traversal(root):
     if root is None:
         return []
     return [root.value] + pre_order_traversal(root.left) + pre_order_traversal(root.right)
+
 
 def collect_tree_levels(root, level=0, levels=None):
     if levels is None:
@@ -57,6 +58,7 @@ def collect_tree_levels(root, level=0, levels=None):
     collect_tree_levels(root.right, level + 1, levels)
     return levels
 
+
 def display_tree(root):
     levels = collect_tree_levels(root)
     max_width = 2 ** (len(levels) - 1)  # Максимальная ширина дерева
@@ -65,6 +67,7 @@ def display_tree(root):
         spacing = " " * (max_width // (2 ** (i + 1)))  # Расстояние между узлами
         result += spacing + spacing.join(level) + "\n"
     return result
+
 
 # Пример использования
 tree = generate_random_tree(10)
@@ -78,7 +81,6 @@ path = []
 
 def process_node(node):
     path.append(node.value)
-    print(node.value)
 
 
 def traverse_tree(root):
@@ -92,9 +94,10 @@ def traverse_tree(root):
     while root:
         process_node(root)
         if root.left is marker:  # Второе посещение терминатора
-            root = root.right  # Сначала делаем правое поддерево новым root
+            root_right = root.right
             root.left = None  # Разрываем служебную ссылку (маркер)
             root.right = None  # Разрываем ссылку на правое поддерево
+            root = root_right
         elif root.left and root.right:
             terminator = get_terminator(root.left)
             terminator.left = marker  # Устанавливаем маркер
