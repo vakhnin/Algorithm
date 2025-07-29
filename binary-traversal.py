@@ -1,5 +1,6 @@
 import random
 
+
 class TreeNode:
     def __init__(self, value):
         self.value = value
@@ -7,8 +8,9 @@ class TreeNode:
         self.right = None
 
     def __repr__(self):
-        return f"TreeNode({self.value})"
-
+        left = f"Left: {self.left.value}" if self.left else "Left: None"
+        right = f"Right: {self.right.value}" if self.right else "Right: None"
+        return f"TreeNode(Value: {self.value}, {left}, {right})"
 
 
 def insert_into_tree(root, value):
@@ -42,19 +44,33 @@ def pre_order_traversal(root):
         return []
     return [root.value] + pre_order_traversal(root.left) + pre_order_traversal(root.right)
 
+def collect_tree_levels(root, level=0, levels=None):
+    if levels is None:
+        levels = []
+    if len(levels) <= level:
+        levels.append([])
+    if root is None:
+        levels[level].append(" ")  # Добавляем пустое место для отсутствующих узлов
+        return levels
+    levels[level].append(str(root.value))
+    collect_tree_levels(root.left, level + 1, levels)
+    collect_tree_levels(root.right, level + 1, levels)
+    return levels
 
-def print_tree(root, level=0, prefix="Root: "):
-    if root is not None:
-        print(" " * (level * 4) + prefix + str(root.value))
-        print_tree(root.left, level + 1, "L--- ")
-        print_tree(root.right, level + 1, "R--- ")
-
+def display_tree(root):
+    levels = collect_tree_levels(root)
+    max_width = 2 ** (len(levels) - 1)  # Максимальная ширина дерева
+    result = ""
+    for i, level in enumerate(levels):
+        spacing = " " * (max_width // (2 ** (i + 1)))  # Расстояние между узлами
+        result += spacing + spacing.join(level) + "\n"
+    return result
 
 # Пример использования
 tree = generate_random_tree(10)
 
 # Вывод результатов обхода
-print(print_tree(tree))
+print(display_tree(tree))
 print("Прямой обход (Pre-order):", pre_order_traversal(tree))
 
 path = []
@@ -62,6 +78,7 @@ path = []
 
 def process_node(node):
     path.append(node.value)
+    print(node.value)
 
 
 def traverse_tree(root):
