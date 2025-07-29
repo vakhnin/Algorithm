@@ -1,3 +1,4 @@
+import copy
 import random
 
 
@@ -94,10 +95,23 @@ def traverse_tree(root):
             root = root.left if root.left else root.right
 
 
+def compare_trees(tree1, tree2):
+    if tree1 is None and tree2 is None:
+        return True
+    if tree1 is None or tree2 is None:
+        return False
+    if tree1.value != tree2.value:
+        return False
+    return compare_trees(tree1.left, tree2.left) and compare_trees(tree1.right, tree2.right)
+
+
 if __name__ == "__main__":
     tree = generate_random_tree(10)
-    # Вывод структуры дерева
-    # print("Дерево:")
+
+    # Сохраняем копию дерева перед обходом
+    original_tree = copy.deepcopy(tree)
+
+    # print("Дерево до обхода:")
     # print(display_tree(tree))
 
     # Классический обход (Pre-order)
@@ -107,7 +121,13 @@ if __name__ == "__main__":
     path = []
     traverse_tree(tree)
 
-    # Сравнение результатов
-    print("Классический обход (Pre-order):", classic_path)
-    print("Ваш пользовательский обход:", path)
-    print("Результаты совпадают?", classic_path == path)
+    # print("Дерево после обхода:")
+    # print(display_tree(tree))
+
+    # Проверяем, что структура дерева вернулась в изначальное состояние
+    is_same_structure = compare_trees(tree, original_tree)
+    print("Структура дерева вернулась в изначальное состояние?", is_same_structure)
+
+    # Проверяем, что результаты обходов совпадают
+    is_same_path = classic_path == path
+    print("Результаты обходов совпадают?", is_same_path)
