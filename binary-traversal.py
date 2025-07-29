@@ -15,6 +15,7 @@ class TreeNode:
 
 
 def insert_into_tree(root, value):
+    # Вставляет значение в бинарное дерево, соблюдая правила BST.
     if root is None:
         return TreeNode(value)
     if value < root.value:
@@ -25,6 +26,7 @@ def insert_into_tree(root, value):
 
 
 def generate_random_tree(n):
+    # Генерирует случайное бинарное дерево с n узлами.
     values = list(range(1, n + 1))
     random.shuffle(values)
     root = None
@@ -34,12 +36,14 @@ def generate_random_tree(n):
 
 
 def pre_order_traversal(root):
+    # Выполняет классический прямой обход (Pre-order) дерева.
     if root is None:
         return []
     return [root.value] + pre_order_traversal(root.left) + pre_order_traversal(root.right)
 
 
 def collect_tree_levels(root, level=0, levels=None):
+    # Собирает узлы дерева по уровням для отображения.
     if levels is None:
         levels = []
     if len(levels) <= level:
@@ -54,6 +58,7 @@ def collect_tree_levels(root, level=0, levels=None):
 
 
 def display_tree(root):
+    # Форматирует дерево в виде строки для наглядного отображения.
     levels = collect_tree_levels(root)
     max_width = 2 ** (len(levels) - 1)
     result = ""
@@ -68,10 +73,12 @@ path = []
 
 
 def process_node(node):
+    # Обрабатывает узел дерева, добавляя его значение в глобальный список path.
     path.append(node.value)
 
 
 def traverse_tree(root):
+    # Выполняет пользовательский обход дерева с использованием маркеров.
     def get_terminator(root):
         while root and (root.left or root.right):
             root = root.right if root.right else root.left
@@ -95,7 +102,7 @@ def traverse_tree(root):
             root = root.left if root.left else root.right
 
 
-def compare_trees(tree1, tree2):
+def compare_trees(tree1, tree2):    # Сравнивает два дерева на идентичность структуры и значений.
     if tree1 is None and tree2 is None:
         return True
     if tree1 is None or tree2 is None:
@@ -106,6 +113,7 @@ def compare_trees(tree1, tree2):
 
 
 def test_trees(num_trees=1000, min_size=10, max_size=50, points_per_line=80):
+    # Тестирует пользовательский обход на множестве случайных деревьев.
     size_distribution = {size: 0 for size in range(min_size, max_size + 1)}
     successful_tests = 0
 
