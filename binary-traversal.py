@@ -94,14 +94,20 @@ def traverse_tree(root):
             root = root.left if root.left else root.right
 
 
-# Классический обход (Pre-order)
-classic_path = pre_order_traversal(tree)
+if __name__ == "__main__":
+    tree = generate_random_tree(10)
+    # Вывод структуры дерева
+    # print("Дерево:")
+    # print(display_tree(tree))
 
-# Ваш пользовательский обход
-path = []
-traverse_tree(tree)
+    # Классический обход (Pre-order)
+    classic_path = pre_order_traversal(tree)
 
-# Сравнение результатов
-print("Классический обход (Pre-order):", classic_path)
-print("Ваш пользовательский обход:", path)
-print("Результаты совпадают?", classic_path == path)
+    # Ваш пользовательский обход
+    path = []
+    traverse_tree(tree)
+
+    # Сравнение результатов
+    print("Классический обход (Pre-order):", classic_path)
+    print("Ваш пользовательский обход:", path)
+    print("Результаты совпадают?", classic_path == path)
