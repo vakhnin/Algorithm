@@ -105,44 +105,49 @@ def compare_trees(tree1, tree2):
     return compare_trees(tree1.left, tree2.left) and compare_trees(tree1.right, tree2.right)
 
 
-def test_trees(num_trees=1000, min_size=10, max_size=5000):
+def test_trees(num_trees=1000, min_size=10, max_size=50, points_per_line=80):
+    size_distribution = {size: 0 for size in range(min_size, max_size + 1)}
+    successful_tests = 0
+
     for i in range(num_trees):
-        # Генерация случайного размера дерева
         size = random.randint(min_size, max_size)
+        size_distribution[size] += 1
+
         values = list(range(1, size + 1))
         random.shuffle(values)
 
-        # Генерация дерева
         tree = None
         for value in values:
             tree = insert_into_tree(tree, value)
 
-        # Сохраняем копию дерева перед обходом
         original_tree = copy.deepcopy(tree)
 
-        # Классический обход (Pre-order)
         classic_path = pre_order_traversal(tree)
 
-        # Ваш пользовательский обход
         path.clear()
         traverse_tree(tree)
 
-        # Проверяем совпадение обходов
         is_same_path = classic_path == path
-
-        # Проверяем, что структура дерева вернулась в изначальное состояние
         is_same_structure = compare_trees(tree, original_tree)
 
         if is_same_path and is_same_structure:
-            print(".", end="", flush=True)  # Вывод точки при успешной проверке
+            successful_tests += 1
+            print(".", end="", flush=True)
+            if successful_tests % points_per_line == 0:
+                print()  # Перенос строки
         else:
-            print("\nРасхождение обнаружено!")
+            print("\nКоллизия обнаружена")
             print("Последовательность для генерации дерева:", values)
             print("Классический обход:", classic_path)
-            print("Ваш пользовательский обход:", path)
+            print("Пользовательский обход:", path)
             print("Структура совпадает?", is_same_structure)
             break
 
+    # Итоговый вывод
+    print("\nТестирование завершено.")
+    print(f"Успешных тестов: {successful_tests}/{num_trees}")
+    print("Коллизии не обнаружены.")
+
 
 if __name__ == "__main__":
-    test_trees(num_trees=1000, min_size=10, max_size=50)
+    test_trees(num_trees=1000, min_size=10, max_size=5000)
