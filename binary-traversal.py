@@ -105,29 +105,44 @@ def compare_trees(tree1, tree2):
     return compare_trees(tree1.left, tree2.left) and compare_trees(tree1.right, tree2.right)
 
 
+def test_trees(num_trees=1000, min_size=10, max_size=5000):
+    for i in range(num_trees):
+        # Генерация случайного размера дерева
+        size = random.randint(min_size, max_size)
+        values = list(range(1, size + 1))
+        random.shuffle(values)
+
+        # Генерация дерева
+        tree = None
+        for value in values:
+            tree = insert_into_tree(tree, value)
+
+        # Сохраняем копию дерева перед обходом
+        original_tree = copy.deepcopy(tree)
+
+        # Классический обход (Pre-order)
+        classic_path = pre_order_traversal(tree)
+
+        # Ваш пользовательский обход
+        path.clear()
+        traverse_tree(tree)
+
+        # Проверяем совпадение обходов
+        is_same_path = classic_path == path
+
+        # Проверяем, что структура дерева вернулась в изначальное состояние
+        is_same_structure = compare_trees(tree, original_tree)
+
+        if is_same_path and is_same_structure:
+            print(".", end="", flush=True)  # Вывод точки при успешной проверке
+        else:
+            print("\nРасхождение обнаружено!")
+            print("Последовательность для генерации дерева:", values)
+            print("Классический обход:", classic_path)
+            print("Ваш пользовательский обход:", path)
+            print("Структура совпадает?", is_same_structure)
+            break
+
+
 if __name__ == "__main__":
-    tree = generate_random_tree(10)
-
-    # Сохраняем копию дерева перед обходом
-    original_tree = copy.deepcopy(tree)
-
-    # print("Дерево до обхода:")
-    # print(display_tree(tree))
-
-    # Классический обход (Pre-order)
-    classic_path = pre_order_traversal(tree)
-
-    # Ваш пользовательский обход
-    path = []
-    traverse_tree(tree)
-
-    # print("Дерево после обхода:")
-    # print(display_tree(tree))
-
-    # Проверяем, что структура дерева вернулась в изначальное состояние
-    is_same_structure = compare_trees(tree, original_tree)
-    print("Структура дерева вернулась в изначальное состояние?", is_same_structure)
-
-    # Проверяем, что результаты обходов совпадают
-    is_same_path = classic_path == path
-    print("Результаты обходов совпадают?", is_same_path)
+    test_trees(num_trees=1000, min_size=10, max_size=50)
