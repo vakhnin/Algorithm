@@ -1,3 +1,4 @@
+import copy
 import random
 
 
@@ -7,8 +8,14 @@ class TreeNode:
         self.left = None
         self.right = None
 
+    def __repr__(self):
+        left = f"Left: {self.left.value}" if self.left else "Left: None"
+        right = f"Right: {self.right.value}" if self.right else "Right: None"
+        return f"TreeNode(Value: {self.value}, {left}, {right})"
+
 
 def insert_into_tree(root, value):
+    # Вставляет значение в бинарное дерево, соблюдая правила BST.
     if root is None:
         return TreeNode(value)
     if value < root.value:
@@ -19,35 +26,136 @@ def insert_into_tree(root, value):
 
 
 def generate_random_tree(n):
-    # Шаг 1: Создать последовательный ряд
+    # Генерирует случайное бинарное дерево с n узлами.
     values = list(range(1, n + 1))
-    # Шаг 2: Перемешать значения
     random.shuffle(values)
-    # Шаг 3: Построить дерево
     root = None
     for value in values:
         root = insert_into_tree(root, value)
     return root
 
 
-# Методы обхода дерева
 def pre_order_traversal(root):
-    """Прямой обход (Pre-order): Узел -> Левое поддерево -> Правое поддерево"""
+    # Выполняет классический прямой обход (Pre-order) дерева.
     if root is None:
         return []
     return [root.value] + pre_order_traversal(root.left) + pre_order_traversal(root.right)
 
 
-def print_tree(root, level=0, prefix="Root: "):
-    if root is not None:
-        print(" " * (level * 4) + prefix + str(root.value))
-        print_tree(root.left, level + 1, "L--- ")
-        print_tree(root.right, level + 1, "R--- ")
+def collect_tree_levels(root, level=0, levels=None):
+    # Собирает узлы дерева по уровням для отображения.
+    if levels is None:
+        levels = []
+    if len(levels) <= level:
+        levels.append([])
+    if root is None:
+        levels[level].append(" ")
+        return levels
+    levels[level].append(str(root.value))
+    collect_tree_levels(root.left, level + 1, levels)
+    collect_tree_levels(root.right, level + 1, levels)
+    return levels
 
 
-# Пример использования
+def display_tree(root):
+    # Форматирует дерево в виде строки для наглядного отображения.
+    levels = collect_tree_levels(root)
+    max_width = 2 ** (len(levels) - 1)
+    result = ""
+    for i, level in enumerate(levels):
+        spacing = " " * (max_width // (2 ** (i + 1)))
+        result += spacing + spacing.join(level) + "\n"
+    return result
+
+
 tree = generate_random_tree(10)
+path = []
 
-# Вывод результатов обхода
-print(print_tree(tree))
-print("Прямой обход (Pre-order):", pre_order_traversal(tree))
+
+def process_node(node):
+    # Обрабатывает узел дерева, добавляя его значение в глобальный список path.
+    path.append(node.value)
+
+
+def traverse_tree(root):
+    # Выполняет пользовательский обход дерева с использованием маркеров.
+    def get_terminator(root):
+        while root and (root.left or root.right):
+            root = root.right if root.right else root.left
+        return root
+
+    marker = TreeNode("Marker")
+
+    while root:
+        process_node(root)
+        if root.left is marker:  # Второе посещение терминатора
+            root_right = root.right  # Сохраняем корень правого поддерева
+            root.left = None  # Разрываем служебную ссылку (маркер)
+            root.right = None  # Разрываем ссылку на правое поддерево
+            root = root_right  # Переходим к обработке правого поддерева
+        elif root.left and root.right:
+            terminator = get_terminator(root.left)
+            terminator.left = marker  # Устанавливаем маркер
+            terminator.right = root.right  # Сохраняем ссылку на правое поддерево
+            root = root.left
+        else:
+            root = root.left if root.left else root.right
+
+
+def compare_trees(tree1, tree2):    # Сравнивает два дерева на идентичность структуры и значений.
+    if tree1 is None and tree2 is None:
+        return True
+    if tree1 is None or tree2 is None:
+        return False
+    if tree1.value != tree2.value:
+        return False
+    return compare_trees(tree1.left, tree2.left) and compare_trees(tree1.right, tree2.right)
+
+
+def test_trees(num_trees=1000, min_size=10, max_size=50, points_per_line=80):
+    # Тестирует пользовательский обход на множестве случайных деревьев.
+    size_distribution = {size: 0 for size in range(min_size, max_size + 1)}
+    successful_tests = 0
+
+    for i in range(num_trees):
+        size = random.randint(min_size, max_size)
+        size_distribution[size] += 1
+
+        values = list(range(1, size + 1))
+        random.shuffle(values)
+
+        tree = None
+        for value in values:
+            tree = insert_into_tree(tree, value)
+
+        original_tree = copy.deepcopy(tree)
+
+        classic_path = pre_order_traversal(tree)
+
+        path.clear()
+        traverse_tree(tree)
+
+        is_same_path = classic_path == path
+        is_same_structure = compare_trees(tree, original_tree)
+
+        if is_same_path and is_same_structure:
+            successful_tests += 1
+            print(".", end="", flush=True)
+            if successful_tests % points_per_line == 0:
+                print()  # Перенос строки
+        else:
+            print("\nКоллизия обнаружена")
+            print("Последовательность для генерации дерева:", values)
+            print("Классический обход:", classic_path)
+            print("Пользовательский обход:", path)
+            print("Структура совпадает?", is_same_structure)
+            break
+
+    # Итоговый вывод
+    print("\nТестирование завершено.")
+    print(f"Успешных тестов: {successful_tests}/{num_trees}")
+    print("Коллизии не обнаружены.")
+
+
+if __name__ == "__main__":
+    test_trees(num_trees=1000, min_size=10, max_size=5000)
